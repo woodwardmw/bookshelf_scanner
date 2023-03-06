@@ -167,7 +167,7 @@ async def get_boxes(image):
 @stub.function
 async def get_online_data(text_boxes, book_box):
     for text_box in text_boxes:
-        if book_box.get_overlap(text_box) > 0.75:
+        if book_box.get_overlap(text_box) > 0.5:
             book_box.text.append(text_box.text)
 
     # print(book_box)

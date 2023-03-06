@@ -108,6 +108,7 @@ async def predict(image):
     results = combined_results[highest_key] + combined_results[second_highest_key]
     
     # This needs tidying up and making async!
+    # Also, I think we should choose the rotations at the book level, since different books can be rotated differently
 
     print("Finished OCR")
     return results
