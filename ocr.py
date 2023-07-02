@@ -1,6 +1,7 @@
 # from easyocr import Reader
 # import cv2
 import modal.aio
+import asyncio
 
 
 stub = modal.aio.AioStub(
@@ -67,35 +68,34 @@ async def get_text(image, rotated=0):
     return results
 
 
-@stub.function
-async def predict(image):
+async def process_image(image, rotation):
+    print(f'Starting OCR for rotation {rotation}')
+    results = await get_text.call(image, rotated=rotation)
+    best_results = [result for result in results if len(result[1]) * result[2] ** 2 > 0.9]
+    print(f'Finishing OCR for rotation {rotation}')
+    return (best_results, sum([result[2] for result in best_results]) / len(results)) if results else ([], 0)
+
+
+@stub.function()
+async def run_process_image(image):
     print("Starting OCR")
     combined_results = {}
     scores = {}
-    results = await get_text.call(image)
-    best_results = [result for result in results if len(result[1]) * result[2] ** 2 > 0.9]
-    combined_results[0] = best_results
-    print(best_results)
-    scores[0] = sum([result[2] for result in best_results]) / len(results)
-    print(sum([result[2] for result in best_results]) / len(results))
-    results = await get_text.call(image, rotated=1)
-    best_results = [result for result in results if len(result[1]) * result[2] ** 2 > 0.9]
-    combined_results[1] = best_results
-    print(best_results)
-    scores[1] = sum([result[2] for result in best_results]) / len(results)
-    print(sum([result[2] for result in best_results]) / len(results))
-    results = await get_text.call(image, rotated=3)
-    best_results = [result for result in results if len(result[1]) * result[2] ** 2 > 0.9]
-    combined_results[3] = best_results
-    print(best_results)
-    scores[3] = sum([result[2] for result in best_results]) / len(results)
-    print(sum([result[2] for result in best_results]) / len(results))
-    results = await get_text.call(image, rotated=2)
-    best_results = [result for result in results if len(result[1]) * result[2] ** 2 > 0.9]
-    combined_results[2] = best_results
-    print(best_results)
-    scores[2] = sum([result[2] for result in best_results]) / len(results)
-    print(sum([result[2] for result in best_results]) / len(results))
+
+    tasks = []
+    for rotation in range(4):
+        tasks.append(process_image(image, rotation))
+
+    results = await asyncio.gather(*tasks)
+
+    for rotation, (best_results, score) in enumerate(results):
+        combined_results[rotation] = best_results
+        scores[rotation] = score
+        print(best_results)
+        print(score)
+
+    # scores[2] = sum([result[2] for result in best_results]) / len(results)
+    # print(sum([result[2] for result in best_results]) / len(results))
 
     # Take the best scoring rotation and the best one adjacent to it
     highest_key = max(scores, key=scores.get)
@@ -111,4 +111,9 @@ async def predict(image):
     # Also, I think we should choose the rotations at the book level, since different books can be rotated differently
 
     print("Finished OCR")
+    return results
+
+@stub.function()
+async def predict(image):
+    results = await run_process_image.call(image)
     return results
