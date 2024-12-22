@@ -1,6 +1,6 @@
 from fastapi import FastAPI, UploadFile, File
 from fastapi.responses import JSONResponse
-from models import Books, Synopsis
+from api.models import Books, Synopsis
 import base64
 import json
 import asyncio
