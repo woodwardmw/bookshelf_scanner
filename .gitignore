@@ -1,0 +1,11 @@
+# pycache
+*__pycache__/
+
+*.ipynb
+
+# virtualenv
+venv/
+
+.env
+
+data/
