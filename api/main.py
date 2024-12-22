@@ -76,3 +76,8 @@ async def fetch_book_info_async(book):
         },
     )
     return json.loads(response.choices[0].message.content)
+
+
+@app.get("/ping")
+async def ping():
+    return {"success": True, "message": "Pong!"}
