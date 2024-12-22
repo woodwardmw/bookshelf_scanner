@@ -1,3 +1,4 @@
+import os
 from fastapi import FastAPI, UploadFile, File
 from fastapi.responses import JSONResponse
 from api.models import Books, Synopsis
@@ -8,6 +9,8 @@ from openai import AsyncOpenAI  # Example placeholder
 from dotenv import load_dotenv
 
 load_dotenv()
+
+print(f'{os.getenv("OPENAI_API_KEY")=}')
 
 app = FastAPI()
 async_client = AsyncOpenAI()
