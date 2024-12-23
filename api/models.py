@@ -14,4 +14,5 @@ class Synopsis(BaseModel):
     rating: float = 0.00
     description: Optional[str] = None
     keywords: List[str] = []
+    series_position: Optional[str] = None  # E.g. "Book 1 of the Harry Potter series"
     similar_books: List[Book] = []
