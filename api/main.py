@@ -56,7 +56,9 @@ async def process_image(photo: UploadFile = File(...)):
         return_exceptions=True,
     )
     results = [result for result in results if not isinstance(result, Exception)]
+    results.sort(key=lambda x: x["rating"], reverse=True)
     print(f"Results: {results}")
+
     return {"success": True, "books": results}
 
 async def fetch_book_info_async(book):

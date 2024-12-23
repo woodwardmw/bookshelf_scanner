@@ -10,6 +10,7 @@ class Books(BaseModel):
 
 class Synopsis(BaseModel):
     title: str
+    author: Optional[str] # Author or authors of the book
     rating: float = 0.00
     description: Optional[str] = None
     keywords: List[str] = []
